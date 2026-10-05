@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced MCQ Exam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #008080; --secondary: #004d4d; --accent: #ff9800; --bg: #f0f4f8; --text: #2d3436; --white: #ffffff; --success: #2ecc71; --error: #e74c3c; --gray: #7f8fa6; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: var(--white); width: 95%; max-width: 700px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; position: relative; }
+        
+        header h1 { color: var(--primary); margin: 0; font-size: 1.4rem; letter-spacing: 0.5px; }
+        .btn { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 50px; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 15px; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,128,128,0.3); font-weight: 600; width: 100%; max-width: 250px; }
+        .btn:hover { transform: scale(1.02); }
+        .btn-gray { background: var(--gray); box-shadow: 0 4px 15px rgba(127,143,166,0.3); }
+        .btn-gray:hover { background: #718093; }
+        .btn-warning { background: linear-gradient(45deg, #e67e22, #d35400); box-shadow: 0 4px 15px rgba(230,126,34,0.3); font-family: 'Cairo', sans-serif; font-size: 1.1rem; max-width: 100%;}
+        
+        .nav-buttons { display: flex; gap: 15px; justify-content: space-between; margin-top: 20px; }
+        .nav-buttons .btn { margin-top: 0; max-width: 48%; }
+        
+        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; gap: 15px;}
+        .question-box { font-size: 1.1rem; font-weight: 600; text-align: left; color: var(--secondary); line-height: 1.5; margin: 0; flex-grow: 1; }
+        
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: white; white-space: nowrap;}
+        .badge-easy { background-color: #2ecc71; }
+        .badge-medium { background-color: #f1c40f; color: #333; }
+        .badge-hard { background-color: #e74c3c; }
+        
+        .difficulty-selector { width: 100%; max-width: 250px; padding: 10px; margin: 15px auto; border-radius: 8px; border: 2px solid var(--primary); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--secondary); outline: none; cursor: pointer; background: #f8f9fa; }
+        
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { background: var(--white); border: 2px solid #e0e0e0; padding: 15px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.3s; font-weight: 500; color: #555; position: relative; }
+        .option-btn:hover:not(.disabled) { background: #f9f9f9; border-color: var(--primary); }
+        .option-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .option-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .option-btn.disabled { pointer-events: none; opacity: 0.9; }
+        
+        .explanation-box { display: none; background: #e8f4f8; border-right: 5px solid var(--primary); padding: 15px; margin-top: 20px; text-align: right; direction: rtl; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 1rem; line-height: 1.6; }
+        
+        .screen { display: none; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .progress-bar { width: 100%; height: 8px; background: #eee; margin: 20px 0; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+        
+        #retry-container { background: #fff3e0; border: 1px solid #ffe0b2; padding: 15px; border-radius: 12px; margin-top: 15px; }
+        #retry-container p { font-family: 'Cairo', sans-serif; color: #d35400; margin: 0 0 10px 0; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="start-screen" class="screen active">
+        <header>
+            <h1>ElBadawi Med Academy 🩺</h1>
+        </header>
+        <div style="margin: 25px 0;"><img src="https://cdn-icons-png.flaticon.com/512/3063/3063205.png" width="90"></div>
+        <h3 id="quiz-title-display" style="color:var(--accent);">Virology Exam</h3>
+        <p>30 MCQs | General Virology</p>
+        
+        <select id="difficulty-filter" class="difficulty-selector">
+            <option value="all">🌐 All Questions (Mix)</option>
+            <option value="easy">🟢 Easy Only</option>
+            <option value="medium">🟡 Medium Only</option>
+            <option value="hard">🔴 Hard (Clinical Scenarios)</option>
+        </select>
+
+        <button class="btn" onclick="startQuiz()">Start Challenge</button>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+        <div id="timer" style="color:var(--error); font-weight:bold; margin-bottom:10px;"></div>
+        
+        <div class="question-header">
+            <div class="question-box" id="question-text"></div>
+            <span id="difficulty-badge" class="badge"></span>
+        </div>
+        
+        <div class="options" id="options-container"></div>
+        
+        <div id="explanation" class="explanation-box">
+            <strong>💡 التوضيح:</strong><br>
+            <span id="explanation-text"></span>
+        </div>
+        
+        <div class="nav-buttons">
+            <button id="prev-btn" class="btn btn-gray" style="display:none;" onclick="prevQuestion()">⬅️ Previous</button>
+            <button id="next-btn" class="btn" style="display:none;" onclick="nextQuestion()">Next Question ➡️</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2>Exam Complete!</h2>
+        <div style="font-size:3rem; font-weight:bold; color:var(--primary);" id="final-score">0%</div>
+        <div style="background:var(--accent); color:white; padding:5px 20px; border-radius:20px; font-weight:700; margin-bottom:20px; display:inline-block;" id="rank-text">Student</div>
+        
+        <div id="retry-container" style="display: none;">
+            <p>عندك بعض الأخطاء محتاج تراجعها وتتعلم منها!</p>
+            <button id="retry-btn" class="btn btn-warning" onclick="retryMistakes()">أعد محاولة الأسئلة الخاطئة 🔄</button>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn" onclick="location.reload()">Return to Main Menu 🔄</button>
+        </div>
+    </div>
+    <footer style="margin-top:25px; font-size:0.8rem; color:#aaa;">Prepared by: ElBadawi Med Academy</footer>
+</div>
+
+<audio id="sound-correct" src="https://actions.google.com/sounds/v1/cartoon/magic_chime.ogg"></audio>
+<audio id="sound-wrong" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+<script>
+    const quizTitle = "Introduction to Virology";
+
+    const mcqQuestions = [
+        { 
+            question: "What is the typical size range of viruses?", 
+            options: ["1-10 nanometers", "20-300 nanometers", "500-1000 nanometers", "1-5 micrometers"], 
+            correct: 1, 
+            explanation: "حجم الفيروسات بيتراوح من 20 إلى 300 نانومتر، وبتعتبر أصغر الكائنات المسببة للأمراض. [Slide 298]",
+            difficulty: "easy"
+        },
+        { 
+            question: "Which of the following is considered a 'non-living' characteristic of viruses?", 
+            options: ["Ability to multiply in living cells", "Complete dependence on living cells", "Acellular structure", "Ability to produce mutated strains"], 
+            correct: 2, 
+            explanation: "التركيب اللّاخلوي (Acellular structure) بيعتبر من خصائص الفيروسات الغير حية، بالإضافة لقدرتها على التبلور. [Slide 299]",
+            difficulty: "medium"
+        },
+        { 
+            question: "Which of the following is a 'living' characteristic of viruses?", 
+            options: ["Ability to crystallize", "Lack of distinct metabolic activity", "Acellular structure", "Having a specific lethal temperature"], 
+            correct: 3, 
+            explanation: "من خصائص الفيروسات الحية إن ليها درجة حرارة قاتلة محددة (specific lethal temperature)، وقدرتها على التكاثر جوا الخلايا. [Slide 299]",
+            difficulty: "medium"
+        },
+        { 
+            question: "The protein covering that surrounds the viral nucleic acid is called the:", 
+            options: ["Envelope", "Capsid", "Nucleotide", "Ribosome"], 
+            correct: 1, 
+            explanation: "الغطاء البروتيني اللي بيحيط بالحمض النووي للفيروس اسمه الـ Capsid. [Slide 300]",
+            difficulty: "easy"
+        },
+        { 
+            question: "What are the protein units that make up the viral capsid called?", 
+            options: ["Nucleosides", "Capsomers", "Peptides", "Lipids"], 
+            correct: 1, 
+            explanation: "الـ Capsid بيتكون من وحدات بروتينية صغيرة اسمها Capsomers. [Slide 300]",
+            difficulty: "easy"
+        },
+        { 
+            question: "Can both DNA and RNA be present together in the same virus?", 
+            options: ["Yes, always", "Yes, in animal viruses only", "No, they cannot be present together", "Only in plant viruses"], 
+            correct: 2, 
+            explanation: "لا يمكن أبداً إن الـ DNA والـ RNA يتواجدوا مع بعض في نفس الفيروس (cannot be present together in the same virus). [Slide 300]",
+            difficulty: "easy"
+        },
+        { 
+            question: "What percentage of the virion's total weight does the nucleic acid typically constitute?", 
+            options: ["1-5%", "5-40%", "50-60%", "80-90%"], 
+            correct: 1, 
+            explanation: "الحمض النووي بيمثل من 5 لـ 40% من وزن الفيريون (virion). [Slide 301]",
+            difficulty: "medium"
+        },
+        { 
+            question: "In an RNA molecule, the base Thymine is replaced by:", 
+            options: ["Adenine", "Guanine", "Cytosine", "Uracil"], 
+            correct: 3, 
+            explanation: "في جزيء الـ RNA، قاعدة الثايمين (Thymine) بتستبدل باليوراسيل (Uracil). [Slide 302]",
+            difficulty: "easy"
+        },
+        { 
+            question: "A molecule consisting of a nitrogenous base, a sugar, and phosphoric acid is called a:", 
+            options: ["Nucleoside", "Nucleotide", "Capsomer", "Peptide"], 
+            correct: 1, 
+            explanation: "لما تتجمع القاعدة النيتروجينية مع السكر وحمض الفوسفوريك، بنسمي المركب النيوكليوتايد (Nucleotide). [Slide 302]",
+            difficulty: "medium"
+        },
+        { 
+            question: "A molecule consisting ONLY of a nitrogenous base and a sugar is called a:", 
+            options: ["Nucleotide", "Nucleoside", "Ribosome", "Capsid"], 
+            correct: 1, 
+            explanation: "الجزء المكون من القاعدة النيتروجينية والسكر بس (من غير فوسفات) بنسميه Nucleoside. [Slide 302]",
+            difficulty: "medium"
+        },
+        { 
+            question: "Which type of RNA carries the amino acids from which proteins are made?", 
+            options: ["rRNA", "mRNA", "tRNA", "vRNA"], 
+            correct: 2, 
+            explanation: "الـ tRNA (الحمض النووي النقال) هو اللي بيشيل الأحماض الأمينية اللي بتتصنع منها البروتينات. [Slide 303]",
+            difficulty: "easy"
+        },
+        { 
+            question: "Which type of RNA carries the information that determines the TYPE of protein made?", 
+            options: ["rRNA", "tRNA", "mRNA", "DNA"], 
+            correct: 2, 
+            explanation: "الـ mRNA هو اللي بيحمل المعلومات والرسالة اللي بتحدد نوع البروتين اللي هيتصنع. [Slide 303]",
+            difficulty: "easy"
+        },
+        { 
+            question: "Structurally, DNA is typically described as a:", 
+            options: ["Single-stranded molecule", "Double-stranded molecule", "Circular protein", "Lipid envelope"], 
+            correct: 1, 
+            explanation: "الـ DNA عادة بيكون جزيء مزدوج الشريط (Double stranded molecules). [Slide 304]",
+            difficulty: "easy"
+        },
+        { 
+            question: "The union of the carboxyl group (-COOH) of one amino acid with the amine group (-NH2) of another amino acid forms a:", 
+            options: ["Hydrogen bond", "Glycosidic bond", "Peptide bond", "Phosphodiester bond"], 
+            correct: 2, 
+            explanation: "الرابطة اللي بتربط مجموعة الكربوكسيل بمجموعة الأمين في حمض أميني تاني اسمها الرابطة الببتيدية (Peptide bond). [Slide 305]",
+            difficulty: "medium"
+        },
+        { 
+            question: "In a protein chain, the end that contains the -NH2 group is called the:", 
+            options: ["C-terminus", "N-terminus", "Peptide end", "Capsid end"], 
+            correct: 1, 
+            explanation: "الطرف اللي فيه مجموعة الأمين (-NH2) بيتسمى N-terminus (الطرف النيتروجيني أو الأميني). [Slide 305]",
+            difficulty: "medium"
+        },
+        { 
+            question: "What is the first step in the lytic cycle of a bacteriophage?", 
+            options: ["Penetration (DNA injection)", "Attachment", "Assembly", "DNA replication"], 
+            correct: 1, 
+            explanation: "أول خطوة في دورة تكاثر الفيروس البكتيري هي الالتصاق (Attachment) بخلية البكتيريا. [Slide 306]",
+            difficulty: "easy"
+        },
+        { 
+            question: "In the lysogenic cycle, what happens immediately after the viral DNA is injected into the bacterium?", 
+            options: ["The bacterium explodes", "The viral DNA replicates immediately", "The viral DNA integrates with the bacterial DNA", "The capsid is assembled"], 
+            correct: 2, 
+            explanation: "في الدورة الوديعة (Lysogenic cycle)، الـ DNA الفيروسي بيندمج (Integration) مع الـ DNA البكتيري. [Slide 306]",
+            difficulty: "hard"
+        },
+        { 
+            question: "Virus propagation can ONLY occur in:", 
+            options: ["Complex non-living media", "Living cells", "Sterile water", "Soil"], 
+            correct: 1, 
+            explanation: "الفيروسات مش بتتكاثر في أي وسط غير حي، لازم تتكاثر جوه خلايا حية بس (inside living cells only). [Slide 307]",
+            difficulty: "easy"
+        },
+        { 
+            question: "When isolating the influenza virus for the first time, which cultivation method is commonly used?", 
+            options: ["Single-layer cell cultures", "Salt displacement", "Use of chicken embryo", "Organ culture"], 
+            correct: 2, 
+            explanation: "زراعة الفيروسات في أجنة الدجاج (chicken embryo) بتُستخدم بكثرة لما بنعزل فيروسات زي الإنفلونزا لأول مرة. [Slide 308]",
+            difficulty: "medium"
+        },
+        { 
+            question: "A laboratory takes a sample from the kidneys and liver of an animal to culture a virus. This specific method is called:", 
+            options: ["Tissue culture", "Organ culture", "Chicken embryo culture", "Salt displacement"], 
+            correct: 1, 
+            explanation: "بما إن العينة متاخدة من عضو كامل زي الكلى أو الكبد، فدي بنسميها مزارع الأعضاء (Organ culture). [Slide 309]",
+            difficulty: "medium"
+        },
+        { 
+            question: "Which of the following describes the method where clotted blood plasma is injected with the virus and living tissue pieces are added?", 
+            options: ["Organ culture", "Tissue culture", "Cell suspension", "Chicken embryo"], 
+            correct: 1, 
+            explanation: "طريقة استخدام بلازما الدم المتجلطة وإضافة قطع أنسجة حية هي إحدى طرق زراعة الأنسجة (Tissue culture). [Slide 310]",
+            difficulty: "hard"
+        },
+        { 
+            question: "In single-layer cell cultures, which enzyme is used to disassemble animal tissues into a cell suspension?", 
+            options: ["Amylase", "Lipase", "Trypsin", "Polymerase"], 
+            correct: 2, 
+            explanation: "بيتم فصل أنسجة الحيوان لـ cell suspension باستخدام إنزيمات محللة للبروتين زي إنزيم التربسين (Trypsin). [Slide 310]",
+            difficulty: "hard"
+        },
+        { 
+            question: "What is the most susceptible stage in an insect's life cycle to be infected with insect viruses?", 
+            options: ["Egg", "Larvae", "Pupa", "Adult"], 
+            correct: 1, 
+            explanation: "مرحلة اليرقة (Larvae) هي أكتر مرحلة بتكون عُرضة للإصابة بالفيروسات الحشرية. [Slide 311]",
+            difficulty: "easy"
+        },
+        { 
+            question: "In the salt displacement (precipitation) method for purifying viruses, which highly soluble salt is commonly used to precipitate proteins?", 
+            options: ["Sodium chloride", "Ammonium sulfate", "Calcium carbonate", "Potassium nitrate"], 
+            correct: 1, 
+            explanation: "في طريقة النزوح الملحي (الترسيب)، بيتم استخدام كبريتات الأمونيوم (Ammonium sulfate) عشان ترسب البروتينات. [Slide 312]",
+            difficulty: "medium"
+        },
+        { 
+            question: "The Baltimore Classification System categorizes viruses primarily based on:", 
+            options: ["The shape of the viral capsid", "The method of making mRNA", "The size of the virus", "The type of host it infects"], 
+            correct: 1, 
+            explanation: "نظام تصنيف بالتيمور بيعتمد بشكل أساسي على طريقة تكوين الـ mRNA (method of making mRNA). [Slide 314]",
+            difficulty: "hard"
+        },
+        { 
+            question: "Which type of symptoms occur when an infection affects the entire plant and the virus is disseminated to various plant organs?", 
+            options: ["External symptoms", "Internal symptoms", "Systemic or generalized symptoms", "Latent symptoms"], 
+            correct: 2, 
+            explanation: "لما الفيروس ينتشر في كل أجزاء النبات، الأعراض دي بنسميها جهازية أو عامة (Systemic or generalized). [Slide 316]",
+            difficulty: "medium"
+        },
+        { 
+            question: "A plant is infected with a virus but shows no outward signs until specific environmental conditions trigger reproduction. This describes:", 
+            options: ["Systemic infection", "Latent infection", "Cellular abnormality", "Lytic cycle"], 
+            correct: 1, 
+            explanation: "لما الفيروس يفضل كامن (latent) وميظهرش أعراض إلا في ظروف معينة، دي بنسميها عدوى كامنة (Latent infection). [Slide 316]",
+            difficulty: "medium"
+        },
+        { 
+            question: "Cellular abnormalities are considered to be what type of symptoms in plant virus diseases?", 
+            options: ["External", "Internal", "Systemic", "Generalized"], 
+            correct: 1, 
+            explanation: "التشوهات أو التغيرات على مستوى الخلايا (Cellular abnormalities) بتُصنف كأعراض داخلية (Internal symptoms). [Slide 316]",
+            difficulty: "medium"
+        },
+        { 
+            question: "Which of the following viruses usually infects humans ONLY?", 
+            options: ["Influenza A", "Influenza B", "Influenza C", "Newcastle virus"], 
+            correct: 1, 
+            explanation: "بناءً على التجميعات في آخر الملف، فيروس Influenza B بيصيب الإنسان فقط. [Slide 316]",
+            difficulty: "hard"
+        },
+        { 
+            question: "Centrifugation is considered what kind of method for virus purification?", 
+            options: ["A chemical method", "A physical method", "A biological method", "An individual characteristic"], 
+            correct: 1, 
+            explanation: "الطرد المركزي (Centrifugation) بيعتبر طريقة فيزيائية (Physical method) لتنقية الفيروسات. [Slide 316]",
+            difficulty: "medium"
+        }
+    ];
+
+    let userAnswers = [];
+    let questionQueue = [];
+    let currentQueueIndex = 0;
+    let timer;
+    const timePerQuestion = 60; 
+
+    document.getElementById('quiz-title-display').innerText = quizTitle;
+
+    function startQuiz() {
+        if(mcqQuestions.length === 0) {
+            alert("No questions found!");
+            return;
+        }
+
+        const selectedDifficulty = document.getElementById('difficulty-filter').value;
+        questionQueue = [];
+        
+        mcqQuestions.forEach((q, index) => {
+            if (selectedDifficulty === 'all' || q.difficulty === selectedDifficulty) {
+                questionQueue.push(index);
+            }
+        });
+
+        if(questionQueue.length === 0) {
+            alert("No questions available for the selected difficulty level.");
+            return;
+        }
+
+        userAnswers = new Array(mcqQuestions.length).fill(null);
+        currentQueueIndex = 0;
+        
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        resetState();
+        let realIndex = questionQueue[currentQueueIndex];
+        const currentQuestion = mcqQuestions[realIndex];
+        
+        document.getElementById('question-text').innerText = "Q" + (currentQueueIndex + 1) + ". " + currentQuestion.question;
+        
+        const badge = document.getElementById('difficulty-badge');
+        badge.innerText = currentQuestion.difficulty || "unrated";
+        badge.className = "badge"; 
+        if(currentQuestion.difficulty === 'easy') badge.classList.add('badge-easy');
+        else if(currentQuestion.difficulty === 'medium') badge.classList.add('badge-medium');
+        else if(currentQuestion.difficulty === 'hard') badge.classList.add('badge-hard');
+        
+        const progressPercent = ((currentQueueIndex) / questionQueue.length) * 100;
+        document.getElementById('progress').style.width = progressPercent + "%";
+
+        document.getElementById('prev-btn').style.display = currentQueueIndex > 0 ? 'block' : 'none';
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        currentQuestion.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.innerText = option;
+            button.classList.add('option-btn');
+            button.onclick = () => selectAnswer(index, button);
+            container.appendChild(button);
+        });
+
+        if (userAnswers[realIndex] !== null) {
+            document.getElementById('timer').innerText = '⏳ Saved Answer';
+            restoreAnswerState();
+        } else {
+            startTimer();
+        }
+    }
+
+    function resetState() {
+        clearInterval(timer);
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('timer').innerText = '';
+    }
+
+    function startTimer() {
+        let timeLeft = timePerQuestion;
+        document.getElementById('timer').innerText = `⏳ ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `⏳ ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                let realIndex = questionQueue[currentQueueIndex];
+                userAnswers[realIndex] = -1; 
+                playSound('wrong');
+                restoreAnswerState();
+            }
+        }, 1000);
+    }
+
+    function selectAnswer(selectedIndex, btn) {
+        clearInterval(timer);
+        let realIndex = questionQueue[currentQueueIndex];
+        userAnswers[realIndex] = selectedIndex;
+        
+        const currentQuestion = mcqQuestions[realIndex];
+        if (selectedIndex === currentQuestion.correct) {
+            playSound('correct');
+        } else {
+            playSound('wrong');
+        }
+
+        restoreAnswerState();
+    }
+
+    function restoreAnswerState() {
+        let realIndex = questionQueue[currentQueueIndex];
+        const currentQuestion = mcqQuestions[realIndex];
+        const correctIndex = currentQuestion.correct;
+        const answeredIndex = userAnswers[realIndex];
+        const allButtons = document.querySelectorAll('.option-btn');
+
+        if (answeredIndex !== -1 && answeredIndex !== null) {
+            if (answeredIndex === correctIndex) {
+                allButtons[answeredIndex].classList.add('correct');
+            } else {
+                allButtons[answeredIndex].classList.add('wrong');
+                allButtons[correctIndex].classList.add('correct');
+            }
+        } else if (answeredIndex === -1) {
+            allButtons[correctIndex].classList.add('correct');
+        }
+
+        disableOptions();
+        showExplanation();
+        
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'block';
+        nextBtn.innerText = (currentQueueIndex === questionQueue.length - 1) ? "Finish Exam 🏁" : "Next Question ➡️";
+    }
+
+    function disableOptions() {
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(button => button.classList.add('disabled'));
+    }
+
+    function showExplanation() {
+        let realIndex = questionQueue[currentQueueIndex];
+        const currentQuestion = mcqQuestions[realIndex];
+        document.getElementById('explanation-text').innerText = currentQuestion.explanation;
+        document.getElementById('explanation').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        if (currentQueueIndex < questionQueue.length - 1) {
+            currentQueueIndex++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQueueIndex > 0) {
+            currentQueueIndex--;
+            loadQuestion();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        
+        let finalScore = 0;
+        let wrongIndices = [];
+        
+        questionQueue.forEach((realIndex) => {
+            if (userAnswers[realIndex] === mcqQuestions[realIndex].correct) {
+                finalScore++;
+            } else {
+                wrongIndices.push(realIndex);
+            }
+        });
+
+        const percentage = Math.round((finalScore / questionQueue.length) * 100);
+        document.getElementById('final-score').innerText = percentage + "%";
+        
+        let rank = "Fail (راسب)";
+        if (percentage >= 90) rank = "Excellent (ممتاز) 🌟";
+        else if (percentage >= 80) rank = "Very Good (جيد جداً) 👏";
+        else if (percentage >= 65) rank = "Good (جيد) 👍";
+        else if (percentage >= 50) rank = "Pass (مقبول) 😐";
+        
+        document.getElementById('rank-text').innerText = rank;
+
+        const retryContainer = document.getElementById('retry-container');
+        if (wrongIndices.length > 0) {
+            retryContainer.style.display = 'block';
+            document.getElementById('retry-btn').innerText = `أعد محاولة الأسئلة الخاطئة (${wrongIndices.length}) 🔄`;
+            window.currentWrongIndices = wrongIndices;
+        } else {
+            retryContainer.style.display = 'none';
+        }
+    }
+
+    function retryMistakes() {
+        questionQueue = window.currentWrongIndices;
+        currentQueueIndex = 0;
+        
+        questionQueue.forEach(idx => userAnswers[idx] = null);
+        
+        document.getElementById('result-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        loadQuestion();
+    }
+
+    function playSound(type) {
+        const id = type === 'correct' ? 'sound-correct' : 'sound-wrong';
+        document.getElementById(id).play().catch(e => {});
+    }
+</script>
+</body>
+</html>
